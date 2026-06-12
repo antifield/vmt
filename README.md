@@ -1,119 +1,89 @@
 # vmt
 
-transcribe and translate discord voice messages
+[![license](https://img.shields.io/github/license/antifield/vmt?style=flat&colorA=000000&colorB=000000)](LICENSE)
+[![black](https://img.shields.io/badge/code%20style-black-000000?style=flat&colorA=000000&colorB=000000)](https://github.com/psf/black)
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/LBtckT?referralCode=originoid&utm_medium=integration&utm_source=template&utm_campaign=generic)
+Transcribe and translate Discord voice messages.
 
-if you don't want to deploy or self-host, we offer our [own instance](https://discord.com/oauth2/authorize?client_id=1434011906829455451) for free. 
+vmt is a Discord app that transcribes voice messages and optionally translates them into 30+ languages via [DeepL](https://www.deepl.com/). It works in servers, group chats, and DMs, and can be installed to a server or to your own account.
 
-you're free to add it to your servers or as an app; it supports voice messages up to 3 minutes.
+> [!NOTE]
+> If you don't want to deploy or self-host, we run a free hosted instance that supports voice messages up to 3 minutes.
+>
+> [Add to Discord →](https://discord.com/oauth2/authorize?client_id=1434011906829455451)
 
-## features
+## Usage
 
-- transcribes voice messages using google speech recognition
-- translates to 30+ languages via deepl api
-- works in servers, dms, and group chats
-- public/private response options
-- context menu support (right-click voice messages)
+1. Right-click a voice message (long-press on mobile)
+2. Select **Apps → Select Voice Message**
+3. Run `/transcribe`, optionally passing a language to translate into
 
-## setting up your discord app
+### Commands
 
-before deploying or running locally, you need to configure your discord application:
+| Command                            | Description                                                                          |
+| ---------------------------------- | ------------------------------------------------------------------------------------ |
+| `/transcribe [translate_to] [public]` | Transcribe the selected voice message, optionally translating it into another language |
+| `/languages [public]`              | Browse all supported translation languages and their codes                           |
+| `/help [public]`                   | Show usage instructions and the command reference                                    |
 
-1. go to the [discord developer portal](https://discord.com/developers/applications) and create a new application (or select an existing one)
-2. navigate to **installation** in the sidebar
-3. under **installation contexts**, enable both:
-   - **user install** - allows users to install the app to their account for personal use
-   - **guild install** - allows the app to be installed to servers
-4. under **default install settings**, make sure `applications.commands` is selected for both **guild install** and **user install**
-5. navigate to **bot** in the sidebar
-6. under **privileged gateway intents**, enable:
-   - **message content intent** - required to read voice message content
-   - **server members intent** - required for server functionality
-7. copy your **bot token** from this page (you'll need it for the environment variables)
-8. copy the **install link** from the installation page to add the bot to your account or server
+Responses are only visible to you by default; set `public: true` to post them to the channel.
 
-## deployment
+## How it works
 
-### railway (recommended)
+Voice messages are decoded with [pydub](https://github.com/jiaaro/pydub) (via FFmpeg), transcribed using Google Speech Recognition through [SpeechRecognition](https://github.com/Uberi/speech_recognition), and translated with the [DeepL API](https://developers.deepl.com/docs).
 
-this project is configured to deploy on [Railway](https://railway.com?referralCode=originoid) in 1-click and automatically handles ffmpeg installation.
-to setup via railway, hit the "deploy on railway" button at the top of this readme
+## Self-hosting
 
-(you'll also get $20 in railway credits upon signup by using our link :3)
+### 1. Create a Discord application
 
-### required environment variables
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications) and create a new application
+2. Under **Installation → Installation Contexts**, enable both **User Install** and **Guild Install**
+3. Under **Installation → Default Install Settings**, add the `applications.commands` scope to both install contexts
+4. Under **Bot → Privileged Gateway Intents**, enable **Message Content Intent** (required to read voice message attachments)
+5. Copy your bot token from the **Bot** page — you'll need it for the environment variables
+6. Copy the install link from the **Installation** page to add the app to your account or server
 
-- `BOT_TOKEN` - your discord bot token (from [discord developer portal](https://discord.com/developers/applications))
-- `DEEPL_API_KEY` - your deepl api key (from [deepl](https://www.deepl.com/pro-api))
-- `DEEPL_FREE_API` - set to `true` if using deepl's free tier, `false` else.
-  - deepl uses different api endpoints for free users (`api-free.deepl.com` vs `api.deepl.com`)
-- `MAX_VOICE_MESSAGE_DURATION` - maximum duration in seconds (default: `60`)
+### 2. Configure environment variables
 
-### local setup
+| Variable                     | Description                                                                                              |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `BOT_TOKEN`                  | Your Discord bot token from the [Developer Portal](https://discord.com/developers/applications)          |
+| `DEEPL_API_KEY`              | Your [DeepL API](https://www.deepl.com/pro-api) key                                                      |
+| `DEEPL_FREE_API`             | Set to `true` if using DeepL's free tier (it uses a separate endpoint, `api-free.deepl.com`); defaults to `false` |
+| `MAX_VOICE_MESSAGE_DURATION` | Maximum voice message duration in seconds (default: `60`)                                                |
 
-1. **clone the repo**
+### 3. Deploy
+
+#### Railway (recommended)
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/LBtckT?referralCode=antifield&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
+This repository deploys to [Railway](https://railway.com?referralCode=antifield) in one click and handles the FFmpeg installation automatically. Signing up through our link also grants you $20 in Railway credits.
+
+#### Run locally
+
+You'll need Python (developed against 3.13) and FFmpeg:
+
+- **macOS:** `brew install ffmpeg`
+- **Ubuntu/Debian:** `sudo apt-get install ffmpeg`
+- **Windows:** download from [ffmpeg.org](https://ffmpeg.org/download.html), or `choco install ffmpeg` via [Chocolatey](https://chocolatey.org/)
 
 ```bash
-git clone https://github.com/originoidco/vmt.git
+git clone https://github.com/antifield/vmt.git
 cd vmt
-```
 
-2. **install dependencies**
-   you'll also need python installed, i'm personally using python 3.13.3:
-
-```bash
 pip install -r requirements.txt
-```
 
-**installing ffmpeg:**
-
-- **macos:** `brew install ffmpeg`
-- **ubuntu/debian:** `sudo apt-get install ffmpeg`
-- **windows:** download from [ffmpeg.org](https://ffmpeg.org/download.html); you can also use `choco install ffmpeg` if you have [chocolately](https://chocolatey.org/)
-
-3. **create `.env` file**
-
-```bash
+# copy env, fill in credentials
 cp .env.example .env
+
+python src/main.py
 ```
 
-edit `.env`:
+## License
 
-```env
-BOT_TOKEN=your_bot_token_here
-DEEPL_API_KEY=your_deepl_key_here
-DEEPL_FREE_API=true
-MAX_VOICE_MESSAGE_DURATION=60
-```
+[antifield/vmt](https://github.com/antifield/vmt) is licensed under the [GNU General Public License v3.0](LICENSE). Authored by [@dromzeh](https://dromzeh.dev/) <[marcel@antifield.com](mailto:marcel@antifield.com)>.
 
-4. **run the app**
+You must state all significant changes made to the original software, make the source code available to the public with credit to the original author, original source, and use the same license.
 
-```bash
-cd src
-python main.py
-# or python ./src/main.py, whatever you prefer
-```
-
-## usage
-
-### transcribing voice messages
-
-1. right-click (or long-press on mobile) a voice message
-2. select **apps → voice message**
-3. use `/transcribe` command
-4. optionally add a language code to translate (e.g., `en` for english, `es` for spanish)
-
-### commands
-
-- `/transcribe [language]` - transcribe the selected voice message, optionally translate to specified language
-- `/languages` - view all supported languages and their codes
-- `/help` - show command help and usage examples
-
-## license
-
-GPL-3.0
-
-## credits
-
-authored by [@dromzeh](https://github.com/dromzeh) <[marcel@originoid.co](mailto:marcel@originoid.co)>
+> © 2023–2026 Antifield LTD | Registered UK Company No. 15988228 | ICO Reference No. ZB857511

@@ -81,13 +81,13 @@ class HelpView(discord.ui.View):
 
             embed.add_field(
                 name="Operated By",
-                value="Originoid LTD",
+                value="Antifield LTD",
                 inline=False,
             )
 
             embed.add_field(
                 name="Repository",
-                value="[github.com/originoidco/vmt](https://github.com/originoidco/vmt)",
+                value="[github.com/antifield/vmt](https://github.com/antifield/vmt)",
                 inline=False,
             )
 
