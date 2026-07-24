@@ -1,0 +1,81 @@
+---
+import ExternalIcon from './ExternalIcon.astro';
+
+const install =
+  'https://discord.com/oauth2/authorize?client_id=1434011906829455451';
+---
+
+<footer>
+  <div
+    class="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-5 pt-28 pb-36 sm:flex-row sm:items-center"
+  >
+    <div>
+      <p class="text-sm font-bold tracking-tight text-fg">vmt</p>
+      <p class="mt-1 text-xs text-faint">
+        © 2023–2026 Antifield LTD · UK Company No. 15988228
+      </p>
+      <p class="mt-3 inline-flex items-center gap-1.5 text-sm text-muted">
+        made with
+        <svg
+          viewBox="0 0 24 24"
+          class="size-3.5 text-[#f2929e]"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004a.75.75 0 01-.69 0z"
+          ></path>
+        </svg>
+        by&#32;<a
+          href="https://dromzeh.dev"
+          class="inline-flex items-center gap-1.5 text-fg transition-colors duration-150 ease-in-out hover:text-nebula-1"
+        >
+          dromzeh
+          <ExternalIcon class="size-3.5" />
+        </a>
+      </p>
+    </div>
+    <div class="flex items-center gap-5 text-sm text-muted">
+      <a
+        href="https://discord.gg/noid"
+        class="transition-colors hover:text-fg"
+        data-discord-invite="noid"
+      >
+        Discord
+      </a>
+      <a
+        href="https://github.com/antifield/vmt"
+        class="transition-colors hover:text-fg"
+      >
+        GitHub
+      </a>
+      <a href={install} class="transition-colors hover:text-fg"
+        >Add to Discord</a
+      >
+    </div>
+  </div>
+</footer>
+
+<script>
+  async function updateDiscordOnline() {
+    const el = document.querySelector<HTMLAnchorElement>(
+      '[data-discord-invite]',
+    );
+    if (!el) return;
+    const invite = el.dataset.discordInvite;
+    try {
+      const res = await fetch(
+        `https://discord.com/api/v9/invites/${invite}?with_counts=true`,
+      );
+      if (!res.ok) return;
+      const data = await res.json();
+      const count = Number(data?.approximate_presence_count);
+      if (!Number.isFinite(count)) return;
+      el.textContent = `Discord (${count.toLocaleString('en-GB')} online)`;
+    } catch {
+      // invite invalid or blocked, leave the link as just "Discord"
+    }
+  }
+
+  updateDiscordOnline();
+</script>

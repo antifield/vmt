@@ -1,0 +1,44 @@
+---
+import DeployCard from './DeployCard.astro';
+import ExternalIcon from './ExternalIcon.astro';
+import RailwayIcon from './RailwayIcon.astro';
+
+const railway =
+  'https://railway.com/deploy/LBtckT?referralCode=antifield&utm_medium=integration&utm_source=template&utm_campaign=generic';
+---
+
+<section id="self-host">
+  <div
+    class="mx-auto grid max-w-6xl items-center gap-14 px-5 py-24 lg:grid-cols-[1fr_1.05fr] lg:gap-10"
+  >
+    <div class="order-2 mx-auto w-full max-w-md lg:order-1 lg:mx-0">
+      <DeployCard />
+    </div>
+
+    <div class="order-1 flex flex-col items-end text-right lg:order-2">
+      <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">
+        Alternatively, host it yourself.
+      </h2>
+      <p class="mt-5 max-w-md text-lg leading-relaxed text-muted">
+        vmt is open source, and setup is one click. Railway deploys it fully
+        configured. All you bring is a Discord bot token and a DeepL key.
+      </p>
+      <div class="mt-7 flex flex-wrap items-center justify-end gap-3">
+        <a
+          href={railway}
+          class="btn-soft inline-flex items-center gap-2 rounded-lg px-4 py-2 font-medium"
+        >
+          <RailwayIcon class="size-4" />
+          Deploy on Railway
+        </a>
+        <a
+          href="https://github.com/antifield/vmt"
+          class="inline-flex items-center gap-1.5 px-1 text-muted transition-colors duration-150 ease-in-out hover:text-fg"
+        >
+          Read the docs
+          <ExternalIcon class="size-3.5" />
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,85 @@
+---
+import Aurora from './Aurora';
+import DiscordIcon from './DiscordIcon.astro';
+
+const install =
+  'https://discord.com/oauth2/authorize?client_id=1434011906829455451';
+---
+
+<section class="relative overflow-hidden">
+  <!-- aurora + stars, top of page only -->
+  <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+    <div
+      class="absolute inset-x-0 top-0 h-[34rem] opacity-45"
+      style="mask-image: linear-gradient(to bottom, black 50%, transparent 96%); -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 96%);"
+    >
+      <Aurora
+        client:load
+        colorStops={['#6d8dff', '#9d7bff', '#6d8dff']}
+        amplitude={0.6}
+        blend={0.85}
+      />
+    </div>
+    <div class="starfield absolute inset-x-0 top-0 h-[36rem]"></div>
+    <div class="starfield-2 absolute inset-x-0 top-0 h-[36rem]"></div>
+    <div class="starfield-3 absolute inset-x-0 top-0 h-[36rem]"></div>
+    <div
+      class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-ink"
+    >
+    </div>
+  </div>
+
+  <div class="relative mx-auto max-w-3xl px-5 pt-40 pb-28 text-center">
+    <a
+      href="https://antifield.com"
+      target="_blank"
+      rel="noreferrer"
+      class="inline-flex items-center gap-2 text-sm leading-none text-muted transition-colors duration-150 ease-in-out hover:text-fg"
+    >
+      <span class="leading-none">a service by</span>
+      <span class="inline-flex items-center gap-2 leading-none text-fg">
+        <svg
+          viewBox="0 0 10 10"
+          fill="currentColor"
+          class="size-3.5"
+          aria-hidden="true"
+        >
+          <rect x="0" y="0" width="2.1" height="2.1"></rect>
+          <rect x="5" y="0" width="2.1" height="2.1"></rect>
+          <rect x="2.5" y="2.5" width="2.1" height="2.1"></rect>
+          <rect x="7.5" y="2.5" width="2.1" height="2.1"></rect>
+          <rect x="0" y="5" width="2.1" height="2.1"></rect>
+          <rect x="5" y="5" width="2.1" height="2.1"></rect>
+          <rect x="2.5" y="7.5" width="2.1" height="2.1"></rect>
+          <rect x="7.5" y="7.5" width="2.1" height="2.1"></rect>
+        </svg>
+        <span class="font-semibold leading-none tracking-tight">antifield</span>
+      </span>
+    </a>
+    <h1
+      class="mt-5 text-5xl leading-[1.05] font-semibold tracking-tight text-balance sm:text-7xl"
+    >
+      Text beats talk.
+    </h1>
+    <p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted">
+      vmt is a free to use translator and transcriber for Discord voice messages
+      inside of your DMs, servers & group chats.
+    </p>
+
+    <div
+      id="hero-cta"
+      class="mt-9 flex flex-wrap items-center justify-center gap-3"
+    >
+      <a
+        href={install}
+        class="btn-discord inline-flex items-center gap-2.5 rounded-lg px-5 py-2.5 font-medium"
+      >
+        <DiscordIcon class="size-5" />
+        Add to Discord
+      </a>
+      <a href="#self-host" class="btn-soft rounded-lg px-5 py-2.5 font-medium">
+        Self-host it
+      </a>
+    </div>
+  </div>
+</section>
