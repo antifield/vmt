@@ -1,0 +1,41 @@
+name: bot
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/bot/**"
+      - ".github/workflows/bot.yml"
+  pull_request:
+    paths:
+      - "apps/bot/**"
+      - ".github/workflows/bot.yml"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/bot
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: apps/bot/uv.lock
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Format check
+        run: uv run ruff format --check .
+
+      - name: Type check
+        run: uv run basedpyright src tests
+
+      - name: Test
+        run: uv run pytest
