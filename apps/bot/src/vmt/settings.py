@@ -79,16 +79,12 @@ def load_settings() -> Settings:
 
     turso_database_url = os.getenv("TURSO_DATABASE_URL") or None
     turso_auth_token = os.getenv("TURSO_AUTH_TOKEN") or None
-    # turso needs both halves of the pair or it can't sync - one alone just quietly
-    # falls back to a local-only db, so at least warn about it
-    if bool(turso_database_url) != bool(turso_auth_token):
-        have = "TURSO_DATABASE_URL" if turso_database_url else "TURSO_AUTH_TOKEN"
-        missing = "TURSO_AUTH_TOKEN" if turso_database_url else "TURSO_DATABASE_URL"
+    # a token without a url does nothing, warn about it. a url without a token is
+    # fine, that's how an authless self-hosted sqld works
+    if turso_auth_token and not turso_database_url:
         log.warning(
-            "%s is set but %s is not, so turso sync is off and vmt will use a "
-            "plain local database instead",
-            have,
-            missing,
+            "TURSO_AUTH_TOKEN is set but TURSO_DATABASE_URL is not, so vmt will "
+            "use a plain local database instead"
         )
 
     if errors:
