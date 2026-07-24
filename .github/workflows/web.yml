@@ -67,27 +67,38 @@ jobs:
         run: bun run build
 
   deploy:
-    # skips quietly until the cloudflare secrets exist in the repo
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.CLOUDFLARE_API_TOKEN != ''
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [format, typecheck, build]
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: apps/web
     steps:
+      # secrets aren't allowed in job-level if, so every step gates on this
+      # check instead - the job no-ops green until the secrets exist
+      - name: Check for cloudflare secrets
+        id: cf
+        run: echo "present=${{ secrets.CLOUDFLARE_API_TOKEN != '' }}" >> "$GITHUB_OUTPUT"
+        working-directory: .
+
       - uses: actions/checkout@v4
+        if: steps.cf.outputs.present == 'true'
 
       - uses: oven-sh/setup-bun@v2
+        if: steps.cf.outputs.present == 'true'
         with:
           bun-version: latest
 
       - name: Install dependencies
+        if: steps.cf.outputs.present == 'true'
         run: bun install --frozen-lockfile
 
       - name: Build
+        if: steps.cf.outputs.present == 'true'
         run: bun run build
 
       - name: Deploy to Cloudflare Workers
+        if: steps.cf.outputs.present == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
