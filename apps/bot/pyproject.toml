@@ -1,0 +1,47 @@
+[project]
+name = "vmt"
+version = "2.0.0"
+description = "Transcribe and translate Discord voice messages"
+requires-python = ">=3.13"
+license = "GPL-3.0-only"
+authors = [{ name = "dromzeh", email = "marcel@antifield.com" }]
+dependencies = [
+    "discord.py>=2.4.0",
+    "python-dotenv>=1.0.0",
+    "deepl>=1.18.0",
+    "pydub>=0.25.1",
+    "SpeechRecognition>=3.10.0",
+    "elevenlabs>=1.50.0",
+    "libsql>=0.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.8.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.25.0",
+    "basedpyright>=1.39.9",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vmt"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.basedpyright]
+# standard keeps the real errors and drops the untyped-third-party noise,
+# libsql ships no type stubs
+typeCheckingMode = "standard"

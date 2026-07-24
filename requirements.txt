@@ -1,5 +1,0 @@
-discord.py>=2.4.0
-python-dotenv>=1.0.0
-deepl>=1.18.0
-pydub>=0.25.1
-SpeechRecognition>=3.10.0
