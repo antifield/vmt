@@ -1,0 +1,58 @@
+---
+import DiscordIcon from './DiscordIcon.astro';
+import Logo from './Logo.astro';
+
+const install =
+  'https://discord.com/oauth2/authorize?client_id=1434011906829455451';
+---
+
+<header id="site-nav" class="site-nav fixed inset-x-0 top-0 z-50">
+  <nav class="mx-auto flex h-14 max-w-6xl items-center justify-between px-5">
+    <a
+      href="/"
+      class="flex items-center gap-2 text-[17px] font-bold tracking-tight text-fg"
+    >
+      <Logo class="size-5" />
+      vmt
+    </a>
+
+    <a
+      href={install}
+      class="btn-discord inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 font-medium"
+    >
+      <DiscordIcon class="size-4" />
+      Add to Discord
+    </a>
+  </nav>
+</header>
+
+<script>
+  const nav = document.getElementById('site-nav');
+  const marker = document.getElementById('hero-cta');
+
+  // stay transparent until the hero cta row is about to slide under the nav
+  let threshold = 480;
+  const measure = () => {
+    if (marker) {
+      threshold =
+        marker.getBoundingClientRect().top +
+        window.scrollY -
+        (nav?.offsetHeight ?? 56);
+    }
+  };
+  const update = () => {
+    nav?.classList.toggle('nav-scrolled', window.scrollY > threshold);
+  };
+
+  measure();
+  update();
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener(
+    'resize',
+    () => {
+      measure();
+      update();
+    },
+    { passive: true },
+  );
+</script>

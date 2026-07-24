@@ -1,18 +1,20 @@
-import discord
-from discord import app_commands
-from discord.ext import commands
 import json
 import os
 
+import discord
+from discord import app_commands
+from discord.ext import commands
+
 
 class LanguageView(discord.ui.View):
-    def __init__(self, language_codes, user_id, transcribe_cmd_id=None):
+    def __init__(self, language_codes, user, transcribe_cmd_id=None):
         super().__init__(timeout=60)
         self.language_codes = language_codes
-        self.user_id = user_id
+        self.user = user
+        self.user_id = user.id
         self.current_page = 0
         self.items_per_page = 18
-        self.message = None
+        self.message: discord.Message | None = None
         self.transcribe_cmd_id = transcribe_cmd_id
 
         sorted_codes = sorted(language_codes.items(), key=lambda x: x[1])
@@ -26,11 +28,13 @@ class LanguageView(discord.ui.View):
 
     async def on_timeout(self):
         for item in self.children:
-            item.disabled = True
+            # only buttons and selects have a disabled switch
+            if isinstance(item, discord.ui.Button | discord.ui.Select):
+                item.disabled = True
         if self.message:
             try:
                 await self.message.edit(view=self)
-            except:
+            except discord.HTTPException:
                 pass
 
     def update_buttons(self):
@@ -66,7 +70,10 @@ class LanguageView(discord.ui.View):
             inline=False,
         )
 
-        embed.set_footer(text=f"Page {self.current_page + 1}/{self.total_pages}")
+        embed.set_footer(
+            text=f"Requested by {self.user.name} • Page {self.current_page + 1}/{self.total_pages}",
+            icon_url=self.user.display_avatar.url,
+        )
         return embed
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
@@ -124,7 +131,7 @@ class OtherCommands(commands.Cog):
         transcribe_cmd_id = transcribe_cmd.id if transcribe_cmd else None
 
         view = LanguageView(
-            self.config["language_codes"], interaction.user.id, transcribe_cmd_id
+            self.config["language_codes"], interaction.user, transcribe_cmd_id
         )
         embed = view.create_embed(transcribe_cmd_id)
         await interaction.response.send_message(

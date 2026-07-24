@@ -1,0 +1,38 @@
+---
+const steps = [
+  {
+    n: '01',
+    title: 'Select the message',
+    body: 'Right-click any voice note and choose <span class="text-fg">Apps → Select Voice Message</span>. Long-press on mobile.',
+  },
+  {
+    n: '02',
+    title: 'Hit <span class="cmd-chip">/transcribe</span>',
+    body: "Throw in a language code if you want it translated, autocomplete's got all 35 covered.",
+  },
+  {
+    n: '03',
+    title: 'Read the reply',
+    body: 'vmt replies with the transcript, visible only to you. Add <span class="cmd-chip">public: true</span> to post it for everyone.',
+  },
+];
+---
+
+<section id="how">
+  <div class="mx-auto max-w-6xl px-5 py-24">
+    <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">
+      How it works
+    </h2>
+    <div class="mt-12 grid gap-12 sm:grid-cols-3">
+      {
+        steps.map((s) => (
+          <div>
+            <p class="text-sm font-semibold text-faint">{s.n}</p>
+            <h3 class="mt-3 text-xl font-medium" set:html={s.title} />
+            <p class="mt-3 leading-relaxed text-muted" set:html={s.body} />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

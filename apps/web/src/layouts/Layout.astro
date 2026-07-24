@@ -1,0 +1,60 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'vmt · voice message transcriber & translator for Discord',
+  description = 'vmt is a free to use translator and transcriber for Discord voice messages inside of your DMs, servers & group chats. Open source, 35 languages.',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'vmt',
+  url: 'https://vmt.sh',
+  description,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Discord',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  author: {
+    '@type': 'Organization',
+    name: 'Antifield LTD',
+    url: 'https://antifield.com',
+  },
+  sameAs: ['https://github.com/antifield/vmt', 'https://discord.gg/noid'],
+});
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="/icon.png" />
+    <link rel="apple-touch-icon" href="/icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="vmt" />
+    <meta property="og:locale" content="en_GB" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="theme-color" content="#0a0b10" />
+    <script type="application/ld+json" set:html={jsonLd} is:inline />
+  </head>
+  <body class="min-h-screen">
+    <slot />
+  </body>
+</html>

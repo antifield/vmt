@@ -1,0 +1,30 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import Features from '../components/Features.astro';
+import SelfHost from '../components/SelfHost.astro';
+import Footer from '../components/Footer.astro';
+import GradualBlur from '../components/GradualBlur';
+---
+
+<Layout>
+  <Nav />
+  <main>
+    <Hero />
+    <Features />
+    <HowItWorks />
+    <SelfHost />
+  </main>
+  <Footer />
+  <GradualBlur
+    client:idle
+    target="page"
+    position="bottom"
+    height="7rem"
+    strength={2}
+    divCount={6}
+    curve="bezier"
+  />
+</Layout>

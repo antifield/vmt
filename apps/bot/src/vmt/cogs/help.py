@@ -1,32 +1,51 @@
+import json
+import os
+
 import discord
 from discord import app_commands
 from discord.ext import commands
-import json
-import os
+
+
+def format_duration(seconds: float) -> str:
+    # seconds, then minutes, then hours, whichever reads naturally
+    if seconds < 90:
+        return f"{seconds:.0f} sec"
+    if seconds < 7200:
+        return f"{seconds / 60:.1f} min"
+    return f"{seconds / 3600:.1f} h"
 
 
 class HelpView(discord.ui.View):
     def __init__(
-        self, user_id, transcribe_cmd_id=None, languages_cmd_id=None, help_cmd_id=None
+        self,
+        user,
+        transcribe_cmd_id=None,
+        languages_cmd_id=None,
+        help_cmd_id=None,
+        stats=None,
     ):
         super().__init__(timeout=60)
-        self.user_id = user_id
+        self.user = user
+        self.user_id = user.id
         self.current_page = 0
         self.total_pages = 2
-        self.message = None
+        self.message: discord.Message | None = None
         self.transcribe_cmd_id = transcribe_cmd_id
         self.languages_cmd_id = languages_cmd_id
         self.help_cmd_id = help_cmd_id
+        self.stats = stats or {}
 
         self.update_buttons()
 
     async def on_timeout(self):
         for item in self.children:
-            item.disabled = True
+            # only buttons and selects have a disabled switch
+            if isinstance(item, discord.ui.Button | discord.ui.Select):
+                item.disabled = True
         if self.message:
             try:
                 await self.message.edit(view=self)
-            except:
+            except discord.HTTPException:
                 pass
 
     def update_buttons(self):
@@ -59,39 +78,32 @@ class HelpView(discord.ui.View):
                 inline=False,
             )
 
-            embed.set_footer(text=f"Page {self.current_page + 1}/{self.total_pages}")
         else:
+            ping_ms = self.stats.get("ping_ms")
+            started_ts = self.stats.get("started_ts")
+
+            lines = [
+                "Created by [dromzeh](https://dromzeh.dev) · [antifield/vmt](https://github.com/antifield/vmt)",
+                "",
+                f"**Ping** {ping_ms}ms" if ping_ms is not None else "**Ping** ...",
+                f"**Online** since <t:{started_ts}:R>"
+                if started_ts
+                else "**Online** just now",
+                # transcribed totals hidden 4 now
+                # f"**Transcribed** {self.stats.get('clips', 0):,} clips"
+                # f" · {format_duration(self.stats.get('seconds', 0.0))}",
+            ]
+
             embed = discord.Embed(
-                title="Credits",
-                description="",
+                title="About vmt",
+                description="\n".join(lines),
                 color=0x7BB2D9,
             )
 
-            embed.add_field(
-                name="Authors",
-                value="[@dromzeh](https://github.com/dromzeh)",
-                inline=False,
-            )
-
-            embed.add_field(
-                name="Contributions",
-                value="[@strazto](https://instagram.com/strazto)",
-                inline=False,
-            )
-
-            embed.add_field(
-                name="Operated By",
-                value="Antifield LTD",
-                inline=False,
-            )
-
-            embed.add_field(
-                name="Repository",
-                value="[github.com/antifield/vmt](https://github.com/antifield/vmt)",
-                inline=False,
-            )
-
-            embed.set_footer(text=f"Page {self.current_page + 1}/{self.total_pages}")
+        embed.set_footer(
+            text=f"Requested by {self.user.name} • Page {self.current_page + 1}/{self.total_pages}",
+            icon_url=self.user.display_avatar.url,
+        )
 
         return embed
 
@@ -139,19 +151,27 @@ class Help(commands.Cog):
     @app_commands.allowed_installs(guilds=True, users=True)
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def help(self, interaction: discord.Interaction, public: bool = False):
-        transcribe_cmd = discord.utils.get(
-            await self.bot.tree.fetch_commands(), name="transcribe"
-        )
-        languages_cmd = discord.utils.get(
-            await self.bot.tree.fetch_commands(), name="languages"
-        )
-        help_cmd = discord.utils.get(await self.bot.tree.fetch_commands(), name="help")
+        # one fetch for all three command ids instead of three round trips
+        cmds = await self.bot.tree.fetch_commands()
+        transcribe_cmd = discord.utils.get(cmds, name="transcribe")
+        languages_cmd = discord.utils.get(cmds, name="languages")
+        help_cmd = discord.utils.get(cmds, name="help")
+
+        clips, seconds = await self.bot.usage.totals()
+        started_at = getattr(self.bot, "started_at", None)
+        stats = {
+            "ping_ms": round(self.bot.latency * 1000),
+            "started_ts": int(started_at.timestamp()) if started_at else None,
+            "clips": clips,
+            "seconds": seconds,
+        }
 
         view = HelpView(
-            interaction.user.id,
+            interaction.user,
             transcribe_cmd.id if transcribe_cmd else None,
             languages_cmd.id if languages_cmd else None,
             help_cmd.id if help_cmd else None,
+            stats=stats,
         )
         embed = view.create_embed()
         await interaction.response.send_message(

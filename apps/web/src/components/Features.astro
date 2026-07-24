@@ -1,0 +1,84 @@
+---
+const languages = [
+  { flag: '🇺🇸', name: 'English', color: '#dd3c4b' },
+  { flag: '🇪🇸', name: 'Español', color: '#eac54f' },
+  { flag: '🇯🇵', name: '日本語', color: '#e64553' },
+  { flag: '🇫🇷', name: 'Français', color: '#5b7cfa' },
+  { flag: '🇩🇪', name: 'Deutsch', color: '#f2c14e' },
+  { flag: '🇧🇷', name: 'Português', color: '#43b581' },
+  { flag: '🇰🇷', name: '한국어', color: '#5b8def' },
+  { flag: '🇨🇳', name: '中文', color: '#e5484d' },
+  { flag: '🇮🇹', name: 'Italiano', color: '#46a758' },
+  { flag: '🇸🇦', name: 'العربية', color: '#30a46c' },
+  { flag: '🇷🇺', name: 'Русский', color: '#6e8bdc' },
+  { flag: '🇳🇱', name: 'Nederlands', color: '#e8703a' },
+  { flag: '🇵🇱', name: 'Polski', color: '#ef5b62' },
+  { flag: '🇺🇦', name: 'Українська', color: '#3e63dd' },
+  { flag: '🇹🇷', name: 'Türkçe', color: '#d7263d' },
+  { flag: '🇻🇳', name: 'Tiếng Việt', color: '#da4453' },
+  { flag: '🇹🇭', name: 'ไทย', color: '#4464ad' },
+  { flag: '🇮🇱', name: 'עברית', color: '#4a90d9' },
+  { flag: '🇸🇪', name: 'Svenska', color: '#ffcd39' },
+  { flag: '🇩🇰', name: 'Dansk', color: '#d7263d' },
+  { flag: '🇳🇴', name: 'Norsk', color: '#d64550' },
+  { flag: '🇫🇮', name: 'Suomi', color: '#4a76d0' },
+  { flag: '🇬🇷', name: 'Ελληνικά', color: '#4a90d9' },
+  { flag: '🇨🇿', name: 'Čeština', color: '#4464ad' },
+  { flag: '🇭🇺', name: 'Magyar', color: '#d7405a' },
+  { flag: '🇷🇴', name: 'Română', color: '#e8b23a' },
+  { flag: '🇧🇬', name: 'Български', color: '#46a758' },
+  { flag: '🇮🇩', name: 'Bahasa Indonesia', color: '#e5484d' },
+  { flag: '🇸🇰', name: 'Slovenčina', color: '#5b7cfa' },
+  { flag: '🇸🇮', name: 'Slovenščina', color: '#4464ad' },
+  { flag: '🇪🇪', name: 'Eesti', color: '#4a90d9' },
+  { flag: '🇱🇹', name: 'Lietuvių', color: '#eac54f' },
+  { flag: '🇱🇻', name: 'Latviešu', color: '#a4343a' },
+  { flag: '🇵🇹', name: 'Português', color: '#46a758' },
+  { flag: '🇬🇧', name: 'English', color: '#3e63dd' },
+];
+
+const rowA = languages.filter((_, i) => i % 2 === 0);
+const rowB = languages.filter((_, i) => i % 2 === 1);
+---
+
+<section class="py-24">
+  <div class="mx-auto max-w-6xl px-5">
+    <p
+      class="max-w-3xl text-3xl leading-snug font-medium tracking-tight text-balance sm:text-4xl"
+    >
+      <span class="text-fg">Sent in any language,</span>&#32;<span
+        class="text-muted">read in yours.</span
+      >&#32;<span class="text-fg">35 languages,</span>&#32;<span
+        class="text-muted"
+        >detected on their own and translated where you chat.</span
+      >
+    </p>
+  </div>
+
+  <div class="mt-14 space-y-4">
+    <div class="marquee">
+      <div class="marquee-track">
+        {
+          [...rowA, ...rowA].map((l) => (
+            <span class="lang-pill" style={`--pill: ${l.color}`}>
+              <span aria-hidden="true">{l.flag}</span>
+              {l.name}
+            </span>
+          ))
+        }
+      </div>
+    </div>
+    <div class="marquee">
+      <div class="marquee-track marquee-track-reverse">
+        {
+          [...rowB, ...rowB].map((l) => (
+            <span class="lang-pill" style={`--pill: ${l.color}`}>
+              <span aria-hidden="true">{l.flag}</span>
+              {l.name}
+            </span>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
