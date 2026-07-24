@@ -1,6 +1,6 @@
 [project]
 name = "vmt"
-version = "2.0.0"
+version = "2.0.1"
 description = "Transcribe and translate Discord voice messages"
 requires-python = ">=3.13"
 license = "GPL-3.0-only"
