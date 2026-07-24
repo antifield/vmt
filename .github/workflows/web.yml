@@ -67,7 +67,8 @@ jobs:
         run: bun run build
 
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # skips quietly until the cloudflare secrets exist in the repo
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.CLOUDFLARE_API_TOKEN != ''
     needs: [format, typecheck, build]
     runs-on: ubuntu-latest
     defaults:
