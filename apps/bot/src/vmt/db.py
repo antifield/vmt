@@ -56,8 +56,10 @@ SCHEMA = (
 class Database:
     """one connection to libsql, wrapped so the rest of the bot can just await it
 
-    give it sync_url and the local file becomes an embedded replica of the
-    remote turso database, otherwise it's just a plain local sqlite file
+    three modes: plain local sqlite file, embedded replica of a turso database
+    (sync_url), or remote only (talks straight to a libsql server over the
+    network, no local file at all - the mode self-hosted sqld wants, since its
+    replica sync endpoints are turso cloud only)
     """
 
     def __init__(
@@ -65,16 +67,24 @@ class Database:
         path: str = "data/vmt.db",
         sync_url: str | None = None,
         auth_token: str | None = None,
+        remote_only: bool = False,
     ):
         self._path = path
         self._sync_url = sync_url
         self._auth_token = auth_token
+        self._remote_only = remote_only and bool(sync_url)
         self._conn = None
         self._lock = asyncio.Lock()
 
     def _connect_sync(self):
-        Path(self._path).parent.mkdir(parents=True, exist_ok=True)
-        if self._sync_url:
+        if self._remote_only:
+            log.info("Using remote libsql database at %s", self._sync_url)
+            conn = libsql.connect(  # pyright: ignore[reportAttributeAccessIssue]
+                self._sync_url,
+                auth_token=self._auth_token or "",
+            )
+        elif self._sync_url:
+            Path(self._path).parent.mkdir(parents=True, exist_ok=True)
             log.info("Connecting to Turso (embedded replica at %s)", self._path)
             conn = libsql.connect(  # pyright: ignore[reportAttributeAccessIssue]
                 self._path,
@@ -83,12 +93,13 @@ class Database:
             )
             conn.sync()
         else:
+            Path(self._path).parent.mkdir(parents=True, exist_ok=True)
             log.info("Using local database at %s", self._path)
             conn = libsql.connect(self._path)  # pyright: ignore[reportAttributeAccessIssue]
         for statement in SCHEMA:
             conn.execute(statement)
         conn.commit()
-        if self._sync_url:
+        if self._sync_url and not self._remote_only:
             conn.sync()
         return conn
 
@@ -103,7 +114,11 @@ class Database:
         cursor = self._conn.execute(sql, params)
         rows = cursor.fetchall()
         self._conn.commit()
-        if self._sync_url and not sql.lstrip().upper().startswith("SELECT"):
+        if (
+            self._sync_url
+            and not self._remote_only
+            and not sql.lstrip().upper().startswith("SELECT")
+        ):
             try:
                 self._conn.sync()
             except Exception:

@@ -29,6 +29,7 @@ class Bot(commands.Bot):
             path=settings.db_path,
             sync_url=settings.turso_database_url,
             auth_token=settings.turso_auth_token,
+            remote_only=settings.turso_remote_only,
         )
         self.provider = get_provider(settings)
         self.translator = Translator(

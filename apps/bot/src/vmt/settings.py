@@ -21,6 +21,7 @@ class Settings:
     elevenlabs_api_key: str | None
     turso_database_url: str | None
     turso_auth_token: str | None
+    turso_remote_only: bool
     daily_limit_seconds: float
     max_voice_message_duration: int
     db_path: str
@@ -103,6 +104,7 @@ def load_settings() -> Settings:
         elevenlabs_api_key=os.getenv("ELEVENLABS_API_KEY") or None,
         turso_database_url=turso_database_url,
         turso_auth_token=turso_auth_token,
+        turso_remote_only=_env_bool("TURSO_REMOTE_ONLY"),
         daily_limit_seconds=daily_limit_seconds,
         max_voice_message_duration=max_voice_message_duration,
         db_path=os.getenv("DB_PATH", "data/vmt.db"),
