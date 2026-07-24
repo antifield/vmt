@@ -12,7 +12,7 @@ on:
       - ".github/workflows/bot.yml"
 
 jobs:
-  check:
+  lint:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,8 +34,40 @@ jobs:
       - name: Format check
         run: uv run ruff format --check .
 
+  typecheck:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/bot
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: apps/bot/uv.lock
+
+      - name: Install dependencies
+        run: uv sync
+
       - name: Type check
         run: uv run basedpyright src tests
+
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/bot
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: apps/bot/uv.lock
+
+      - name: Install dependencies
+        run: uv sync
 
       - name: Test
         run: uv run pytest
